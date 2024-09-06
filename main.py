@@ -19,16 +19,16 @@ except Exception as error:
     print(error)
 
 
-#inserindo tarefas no todo-ist
+#Inserindo tarefas no todo-ist
 for i in range(len(instanciasFlow)):
-    jaImportada = False
+    instanciaImportada = False
     instancia = str(instanciasFlow[i][0])
     for j in range(len(tarefasTodoIst)):
         if ('Instância ' + instancia) in tarefasTodoIst[j].content:
-            jaImportada = True
+            instanciaImportada = True
             break
     
-    if jaImportada == False:
+    if instanciaImportada == False:
         print('Inserindo instância ' + instancia)
         try:
             task = api.add_task(content="Instância " + str(instanciasFlow[i][0])
@@ -40,24 +40,25 @@ for i in range(len(instanciasFlow)):
         except Exception as error:
             print(error)
 
+#Atualizando/concluindo tarefas no todo-ist
 for i in range(len(tarefasTodoIst)):
-    print(tarefasTodoIst[i].content)
-
-#for i in range(len(instanciasFlow)):
-#    print('Instância: '   + str(instanciasFlow[i][0]))
-#    print('Solicitação: ' + instanciasFlow[i][1])
-#    print('Solicitante: ' + instanciasFlow[i][2])
-#    print('Dono: '        + instanciasFlow[i][3])
-#    print('Tarefa: '      + instanciasFlow[i][4], end='\n\n')
-#
-#    try:
-#        task = api.add_task(content="Instância " + str(instanciasFlow[i][0])
-#                            , description= "* **Solicitação**: " + instanciasFlow[i][1] + '\n' + 
-#                                           "* **Solicitante**: " + instanciasFlow[i][2] + '\n' + 
-#                                           "* **Dono**: "        + instanciasFlow[i][3] + '\n' + 
-#                                           "* **Tarefa**: "      + instanciasFlow[i][4]
-#                            , project_id=os.getenv('TODOIST_PROJECT_ID'))
-#        print(task)
-#    except Exception as error:
-#        print(error)
-#s.logout()
+    finalizada = True
+    for j in range(len(instanciasFlow)):
+        #Caso a tarefa já tenha sido finalizada no sankhya flow, marca como concluida a tarefa no todo-ist 
+        if tarefasTodoIst[i].content == ('Instância ' + str(instanciasFlow[j][0])):
+            finalizada = False
+            
+            #Caso ocorra alguma mudança no dono da tarefa ou no nome da tarefa (processo andou mas continua com o mesmo dono), atualiza a tarefa com as novas informações.
+            if (instanciasFlow[j][3] not in tarefasTodoIst[i].description) or (instanciasFlow[j][4] not in tarefasTodoIst[i].description):
+                api.update_task(task_id=tarefasTodoIst[i].id, 
+                                description= "* **Solicitação**: " + instanciasFlow[j][1] + '\n' + 
+                                             "* **Solicitante**: " + instanciasFlow[j][2] + '\n' + 
+                                             "* **Dono**: "        + instanciasFlow[j][3] + '\n' + 
+                                             "* **Tarefa**: "      + instanciasFlow[j][4])
+            break
+    
+    if finalizada == True and 'Instância ' in tarefasTodoIst[i].content:
+        try:
+            api.close_task(task_id = tarefasTodoIst[i].id)
+        except Exception as error:
+            print(error)
