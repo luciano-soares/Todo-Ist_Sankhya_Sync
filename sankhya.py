@@ -1,5 +1,10 @@
 import requests
 import json
+import logging
+
+logging.basicConfig(filename='debug.txt', level=logging.INFO, 
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger('sankhya')
 
 class Sankhya:
     __token = None
@@ -95,14 +100,20 @@ class Sankhya:
             'password': self.senha
         }
 
+        logger.info("Realizando login")
+        logger.info("URL: https://api.sankhya.com.br/login")
+        logger.info("headers: " + str(headers))
+
         response = requests.request('POST', url, headers=headers)
         response = json.loads(response.text)
 
         #Login efetuado com sucesso
         if response['error'] == None:
+            logger.info("Login realizado com sucesso. Retorno api: " + str(response))
             self.setToken(response['bearerToken'])
         #Ocorreu algum problema ao efetuar o login.
         else:
+            logger.error("Login não realizado. Retorno api: " + str(response))
             return False
         
     def logout(self):
@@ -146,7 +157,12 @@ class Sankhya:
             'Authorization': 'Bearer ' + self.__token
         }
 
-        requests.request("GET", url, headers=headers)
+        logger.info("Realizando logout")
+        logger.info("URL: https://api.sankhya.com.br/gateway/v1/mge/service.sbr?serviceName=MobileLoginSP.logout&outputType=json")
+        logger.info("headers: " + str(headers))
+
+        response = requests.request("GET", url, headers=headers)
+        logger.info('Retorno requisição: ' + response.text)
 
     def buscaTarefasFlow(self):
         """
@@ -313,11 +329,18 @@ class Sankhya:
             'Authorization': 'Bearer ' + self.__token
         }
 
+        logger.info("Buscando instâncias Flow")
+        logger.info("URL: https://api.sankhya.com.br/gateway/v1/mge/service.sbr?serviceName=DbExplorerSP.executeQuery&outputType=json")
+        logger.info("headers: " + str(headers))
+        logger.info("Body:" + str(body))
+
         response = requests.request("POST", url, headers=headers, data=body)
         response = json.loads(response.text)
         if response['status'] == '1':
+            logger.info("Requisição de busca processadoa com sucesso. Retorno:" + str(response))
             return response['responseBody']['rows']
         else:
+            logger.error("Erro ao processar requisição de busca. Erro:" + str(response))
             return []
 
     def setToken(self, token):
