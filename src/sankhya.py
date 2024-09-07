@@ -2,7 +2,7 @@ import requests
 import json
 import logging
 
-logging.basicConfig(filename='../logs/debug.txt', level=logging.INFO, 
+logging.basicConfig(filename='../logs/debug.log', level=logging.INFO, 
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger('sankhya')
 

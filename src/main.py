@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from todoist_api_python.api import TodoistAPI
 
 # Configuração do logging para registrar eventos e erros no arquivo debug.txt
-logging.basicConfig(filename='../logs/debug.txt', level=logging.INFO, 
+logging.basicConfig(filename='../logs/debug.log', level=logging.INFO, 
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 # Cria um logger para o módulo principal
